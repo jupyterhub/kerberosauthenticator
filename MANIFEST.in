@@ -1,0 +1,5 @@
+recursive-include kerberosauthenticator *.py
+
+include LICENSE
+include README.rst
+include versioneer.py
