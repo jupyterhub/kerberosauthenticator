@@ -29,6 +29,7 @@ setup(
     packages=['kerberosauthenticator'],
     python_requires='>=3.5',
     install_requires=[
+        'jupyterhub',
         'pykerberos;platform_system!="Windows"',
         'winkerberos;platform_system=="Windows"',
     ]
