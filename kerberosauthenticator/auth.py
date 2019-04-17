@@ -2,8 +2,31 @@ import os
 
 import kerberos
 from jupyterhub.auth import LocalAuthenticator
+from jupyterhub.handlers import BaseHandler
+from jupyterhub.utils import url_path_join
 from tornado import web
 from traitlets import Unicode
+
+
+class KerberosLoginHandler(BaseHandler):
+    def raise_auth_required(self):
+        self.set_status(401)
+        self.write('Authentication required')
+        self.set_header("WWW-Authenticate", "Negotiate")
+        raise web.Finish()
+
+    async def get(self):
+        auth_header = self.request.headers.get('Authorization')
+        if not auth_header:
+            self.raise_auth_required()
+
+        auth_type, auth_key = auth_header.split(" ", 1)
+        if auth_type != 'Negotiate':
+            self.raise_auth_required()
+
+        # Headers are of the proper form, bounce back to main login to do
+        # actual auth in the main handler
+        self.redirect(self.get_next_url())
 
 
 class KerberosAuthenticator(LocalAuthenticator):
@@ -31,27 +54,22 @@ class KerberosAuthenticator(LocalAuthenticator):
         super().__init__(**kwargs)
         os.environ['KRB5_KTNAME'] = self.keytab
 
-    def log_auth_error(self, msg=None, exc_info=None):
-        if msg is not None:
-            msg = "Kerberos failure: %s" % msg
-        else:
-            msg = "Kerberos failure"
-        self.log.error(msg, exc_info=exc_info)
+    def get_handlers(self, app):
+        return [('/kerberos_login', KerberosLoginHandler)]
 
-    def raise_auth_required(self, handler):
-        handler.set_status(401)
-        handler.write('Authentication required')
-        handler.set_header("WWW-Authenticate", "Negotiate")
-        raise web.Finish()
+    def login_url(self, base_url):
+        return url_path_join(base_url, 'kerberos_login')
 
     async def authenticate(self, handler, data):
         auth_header = handler.request.headers.get('Authorization')
         if not auth_header:
-            return self.raise_auth_required(handler)
+            self.log.warn("authenticate hit with no kerberos credentials")
+            return None
 
         auth_type, auth_key = auth_header.split(" ", 1)
         if auth_type != 'Negotiate':
-            return self.raise_auth_required(handler)
+            self.log.warn("authenticate hit with no kerberos credentials")
+            return None
 
         gss_context = None
         try:
@@ -65,17 +83,13 @@ class KerberosAuthenticator(LocalAuthenticator):
             # keep these checks in just in case pykerberos changes its behavior
             # to match its docs, but they likely never will trigger.
             if rc != kerberos.AUTH_GSS_COMPLETE:
-                self.log_auth_error(
-                    "GSS server init failed, return code = %r" % rc
-                )
+                self.log.error("GSS server init failed, return code = %r", rc)
                 return None
 
             # Challenge step
             rc = kerberos.authGSSServerStep(gss_context, auth_key)
             if rc != kerberos.AUTH_GSS_COMPLETE:
-                self.log_auth_error(
-                    "GSS server step failed, return code = %r" % rc
-                )
+                self.log.error("GSS server step failed, return code = %r", rc)
                 return None
             gss_key = kerberos.authGSSServerResponse(gss_context)
 
@@ -87,7 +101,8 @@ class KerberosAuthenticator(LocalAuthenticator):
             handler.set_header('WWW-Authenticate', "Negotiate %s" % gss_key)
             return user
         except kerberos.GSSError as err:
-            self.log_auth_error(exc_info=err)
+            self.log.error("Error occurred during kerberos authentication",
+                           exc_info=err)
             return None
         finally:
             if gss_context is not None:
