@@ -6,35 +6,6 @@ from tornado import web
 from traitlets import Unicode
 
 
-html_form = """
-<form action="{{login_url}}?next={{next}}" method="post" role="form">
-  <div class="auth-form-header">
-    Log in with Kerberos
-  </div>
-  <div class='auth-form-body'>
-
-    <p id='insecure-login-warning' class='hidden'>
-    Warning: JupyterHub seems to be served over an unsecured HTTP connection.
-    We strongly recommend enabling HTTPS for JupyterHub.
-    </p>
-
-    {% if login_error %}
-    <p class="login_error">
-      {{login_error}}
-    </p>
-    {% endif %}
-    <input
-      type="submit"
-      id="login_submit"
-      class='btn btn-jupyter'
-      value='Log In'
-      tabindex="3"
-    />
-  </div>
-</form>
-"""
-
-
 class KerberosAuthenticator(LocalAuthenticator):
     """
     Kerberos Authenticator for JupyterHub
@@ -54,14 +25,18 @@ class KerberosAuthenticator(LocalAuthenticator):
         config=True
     )
 
-    custom_html = html_form
+    login_service = "kerberos"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         os.environ['KRB5_KTNAME'] = self.keytab
 
-    def log_auth_error(self, err):
-        self.log.error("Kerberos failure: %s", err)
+    def log_auth_error(self, msg=None, exc_info=None):
+        if msg is not None:
+            msg = "Kerberos failure: %s" % msg
+        else:
+            msg = "Kerberos failure"
+        self.log.error(msg, exc_info=exc_info)
 
     def raise_auth_required(self, handler):
         handler.set_status(401)
@@ -70,7 +45,7 @@ class KerberosAuthenticator(LocalAuthenticator):
         raise web.Finish()
 
     async def authenticate(self, handler, data):
-        auth_header = self.request.headers.get('Authorization')
+        auth_header = handler.request.headers.get('Authorization')
         if not auth_header:
             return self.raise_auth_required(handler)
 
@@ -99,7 +74,6 @@ class KerberosAuthenticator(LocalAuthenticator):
             rc = kerberos.authGSSServerStep(gss_context, auth_key)
             if rc != kerberos.AUTH_GSS_COMPLETE:
                 self.log_auth_error(
-                    handler,
                     "GSS server step failed, return code = %r" % rc
                 )
                 return None
@@ -113,7 +87,7 @@ class KerberosAuthenticator(LocalAuthenticator):
             handler.set_header('WWW-Authenticate', "Negotiate %s" % gss_key)
             return user
         except kerberos.GSSError as err:
-            self.log_auth_error(handler, err)
+            self.log_auth_error(exc_info=err)
             return None
         finally:
             if gss_context is not None:
