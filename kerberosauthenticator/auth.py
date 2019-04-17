@@ -11,6 +11,7 @@ from traitlets import Unicode
 class KerberosLoginHandler(BaseHandler):
     def raise_auth_required(self):
         self.set_status(401)
+        # TODO: nice template
         self.write('Authentication required')
         self.set_header("WWW-Authenticate", "Negotiate")
         raise web.Finish()
@@ -24,9 +25,14 @@ class KerberosLoginHandler(BaseHandler):
         if auth_type != 'Negotiate':
             self.raise_auth_required()
 
-        # Headers are of the proper form, bounce back to main login to do
-        # actual auth in the main handler
-        self.redirect(self.get_next_url())
+        # Headers are of the proper form, initialize login routine
+        user = await self.login_user()
+        if user is None:
+            # TODO: nice template
+            raise web.HTTPError(403)
+        else:
+            # Logged in, redirect to next url
+            self.redirect(self.get_next_url(user))
 
 
 class KerberosAuthenticator(LocalAuthenticator):
