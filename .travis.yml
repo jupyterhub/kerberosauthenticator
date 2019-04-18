@@ -1,5 +1,4 @@
 language: python
-sudo: required
 dist: trusty
 os: linux
 python:
@@ -7,9 +6,6 @@ python:
 
 services:
   - docker
-
-git:
-  depth: false  # Ensure latest tag is pulled
 
 branches:
   only:
@@ -20,18 +16,39 @@ jobs:
 
   include:
     - if: commit_message !~ skip-tests
-    - sudo: false
-      env:
-        - DOCS=true
+    - env:
+      - DOCS=true
 
 before_install:
-  - ./continuous_integration/before_install.sh
+  - |
+    if [[ "$DOCS" != "true" ]]; then
+      ./continuous_integration/before_install.sh
+    fi
 
 install:
-  - docker exec -it kerberosauthenticator-testing ./working/continuous_integration/install.sh
+  - |
+    if [[ "$DOCS" != "true" ]]; then
+      docker exec -it kerberosauthenticator-testing ./working/continuous_integration/install.sh
+    else
+      pip install jupyterhub pykerberos sphinx doctr
+      pip install -e .
+    fi
 
 script:
-  - docker exec -it kerberosauthenticator-testing ./working/continuous_integration/script.sh
+  - |
+    if [[ "$DOCS" != "true" ]]; then
+      docker exec -it kerberosauthenticator-testing ./working/continuous_integration/script.sh
+    else
+      set -xe
+      pushd docs
+      make html
+      popd
+
+      # Maybe deploy documentation
+      if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "push" ]]; then
+          doctr deploy . --built-docs docs/build/html/
+      fi
+    fi
 
 notifications:
   email: false
