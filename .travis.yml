@@ -1,0 +1,37 @@
+language: python
+sudo: required
+dist: trusty
+os: linux
+python:
+  - "3.6"
+
+services:
+  - docker
+
+git:
+  depth: false  # Ensure latest tag is pulled
+
+branches:
+  only:
+    - master
+
+jobs:
+  fast_finish: true
+
+  include:
+    - if: commit_message !~ skip-tests
+    - sudo: false
+      env:
+        - DOCS=true
+
+before_install:
+  - ./continuous_integration/before_install.sh
+
+install:
+  - docker exec -it kerberosauthenticator-testing ./working/continuous_integration/install.sh
+
+script:
+  - docker exec -it kerberosauthenticator-testing ./working/continuous_integration/script.sh
+
+notifications:
+  email: false

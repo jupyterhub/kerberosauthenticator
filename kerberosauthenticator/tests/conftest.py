@@ -10,15 +10,18 @@ from kerberosauthenticator import KerberosAuthenticator
 
 io_loop = io_loop
 
+HTTP_KEYTAB = '/root/HTTP.keytab'
+USERS_KEYTAB = '/root/users.keytab'
+
 
 @pytest.fixture(scope="module")
 def app(request, io_loop):
     app = MockHub(
         authenticator=KerberosAuthenticator(
-            keytab='/home/testuser/HTTP.keytab',
+            keytab=HTTP_KEYTAB
         ),
         cookie_secret=os.urandom(32),
-        hub_ip="edge.example.com"
+        hub_ip="address.example.com"
     )
 
     async def make_app():
@@ -48,10 +51,8 @@ def logged_in(request):
     return request.param
 
 
-def kinit():
-    subprocess.check_call([
-        "kinit", "-kt", '/home/testuser/testuser.keytab', 'testuser'
-    ])
+def kinit(username='alice'):
+    subprocess.check_call(["kinit", "-kt", USERS_KEYTAB, username])
 
 
 def kdestroy():

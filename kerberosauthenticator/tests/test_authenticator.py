@@ -13,7 +13,7 @@ def test_integration(app, auto_login, logged_in):
     app.authenticator.auto_login = auto_login
 
     # Create a user
-    add_user(app.db, app, name="testuser")
+    add_user(app.db, app, name="alice")
 
     if auto_login:
         url = public_url(app, path="/hub/login")
@@ -32,7 +32,7 @@ def test_integration(app, auto_login, logged_in):
     # Go through the login procedure
     resp = yield async_requests.get(
         url,
-        auth=HTTPKerberosAuth(hostname_override="edge.example.com")
+        auth=HTTPKerberosAuth(hostname_override="address.example.com")
     )
 
     if logged_in:
@@ -40,7 +40,7 @@ def test_integration(app, auto_login, logged_in):
         resp.raise_for_status()
 
         # At user notebook, login successful
-        assert resp.url.startswith(public_url(app, path="/user/testuser"))
+        assert resp.url.startswith(public_url(app, path="/user/alice"))
     else:
         # Unsuccessful
         assert resp.status_code == 401
