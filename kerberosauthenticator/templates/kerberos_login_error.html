@@ -1,0 +1,18 @@
+{% extends "page.html" %}
+
+{% block main %}
+<div id="login-failure" class="container error" style="margin:auto; width:50%">
+    <p>
+    Failed to login with Kerberos. Please check that you have obtained a
+    Kerberos ticket and enabled Kerberos support in your browser.
+    </p>
+    <p>
+    For more information, please see <a
+        href=https://jcrist.github.io/kerberosauthenticator/>the
+        documentation</a>.
+    </p>
+    <p>
+    <a href='{{login_url}}'> Return to login page</a>
+    </p>
+</div>
+{% endblock %}
