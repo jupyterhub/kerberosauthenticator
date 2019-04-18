@@ -1,4 +1,5 @@
 recursive-include kerberosauthenticator *.py
+include kerberosauthenticator/templates/*.html
 
 include LICENSE
 include README.rst

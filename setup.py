@@ -32,5 +32,6 @@ setup(
         'jupyterhub',
         'pykerberos;platform_system!="Windows"',
         'winkerberos;platform_system=="Windows"',
-    ]
+    ],
+    include_package_data=True
 )

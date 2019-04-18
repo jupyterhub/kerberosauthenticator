@@ -6,6 +6,7 @@ container_id="kerberosauthenticator-testing"
 docker run --rm -d \
     -h address.example.com \
     -p 88:88/udp \
+    -p 8888:8888 \
     --name $container_id \
     -v "$git_root":/working \
     jcrist/kerberosauthenticator-testing 

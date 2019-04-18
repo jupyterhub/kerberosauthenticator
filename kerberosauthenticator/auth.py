@@ -1,6 +1,7 @@
 import os
 
 import kerberos
+from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.auth import Authenticator
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.utils import url_path_join
@@ -8,11 +9,31 @@ from tornado import web
 from traitlets import Unicode
 
 
+TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+
+
 class KerberosLoginHandler(BaseHandler):
+    _loaded = False
+
+    def __init__(self, *args, **kwargs):
+        if KerberosLoginHandler._loaded:
+            return
+        super().__init__(*args, **kwargs)
+
+        self.log.debug('Adding %s to template path', TEMPLATE_DIR)
+        loader = FileSystemLoader([TEMPLATE_DIR])
+        env = self.settings['jinja2_env']
+        previous_loader = env.loader
+        env.loader = ChoiceLoader([previous_loader, loader])
+        self._loaded = True
+
     def raise_auth_required(self):
         self.set_status(401)
-        # TODO: nice template
-        self.write('Authentication required')
+        data = self.render_template(
+            'kerberos_login_error.html',
+            login_url=self.settings['login_url']
+        )
+        self.write(data)
         self.set_header("WWW-Authenticate", "Negotiate")
         raise web.Finish()
 
@@ -28,7 +49,6 @@ class KerberosLoginHandler(BaseHandler):
         # Headers are of the proper form, initialize login routine
         user = await self.login_user()
         if user is None:
-            # TODO: nice template
             raise web.HTTPError(403)
         else:
             # Logged in, redirect to next url
