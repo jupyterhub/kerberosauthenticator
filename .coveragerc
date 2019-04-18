@@ -1,0 +1,6 @@
+[run]
+omit =
+    kerberosauthenticator/tests/*.py
+    kerberosauthenticator/_version.py
+source =
+    kerberosauthenticator
