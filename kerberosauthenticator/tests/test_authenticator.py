@@ -20,6 +20,9 @@ def test_integration(app, auto_login, logged_in):
         resp = yield async_requests.get(url)
         # Sends back 401 requesting authentication
         assert resp.status_code == 401
+        # 401 page is formatted nicely
+        assert "Failed to login with Kerberos." in resp.text
+        assert resp.text.count("/hub/login") >= 2
         # Before that was a redirect to the auth handler
         assert resp.history[0].status_code == 302
         # Now use the redirected url with auth enabled
