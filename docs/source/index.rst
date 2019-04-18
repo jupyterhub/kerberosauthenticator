@@ -3,6 +3,9 @@ kerberosauthenticator
 
 An Authenticator_ for JupyterHub_ that authenticates using Kerberos_.
 
+.. contents:: :local:
+
+
 Installation
 ------------
 
@@ -61,6 +64,14 @@ several other options such as whitelists or post-auth hooks. For more
 information on all configuration options, see :doc:`options`.
 
 
+Enabling Kerberos Authentication in Your Browser
+------------------------------------------------
+
+For Kerberos authentication to work properly, you usually have to enable
+support for it in your browser. For more information see `this guide from
+Cloudera`_.
+
+
 Additional Resources
 --------------------
 
@@ -87,6 +98,7 @@ Wiki`_.
 .. _Kerberos: https://web.mit.edu/kerberos/
 .. _JupyterHub: https://jupyterhub.readthedocs.io/en/stable/
 .. _fully qualified domain name: https://en.wikipedia.org/wiki/Fully_qualified_domain_name
+.. _this guide from Cloudera: https://www.cloudera.com/documentation/enterprise/5-12-x/topics/cdh_sg_browser_access_kerberos_protected_url.html
 .. _ldapauthenticator: https://github.com/jupyterhub/ldapauthenticator
 .. _LDAP: https://en.wikipedia.org/wiki/Lightweight_Directory_Access_Protocol
 .. _jhub_remote_user_authenticator: https://github.com/cwaldbieser/jhub_remote_user_authenticator
