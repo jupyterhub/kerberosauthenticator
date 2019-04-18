@@ -11,6 +11,10 @@ branches:
   only:
     - master
 
+env:
+  global:
+    - secure: "BLR8usCFiXmSj12eRtubnpkmJKuDRDropT5GlwyT9EvAcGhSZCXjEpIrW3Z5skOQUz6GhODygzBEmR+0Q6jdCiWaILzOQsKBdQXZYxWxIm6YFbnFq5neucqqfLh3U50SXEsTn3D8ubcr4N9sAmZ8W1H1807Op/nYOwkckNZt/FQuAzVfavXRlh5Q6JmrG9oXXgatdFCNYo0bPWEkaArGbqw571gx47+nh6MKVlCz3Lv6pm63hlyd5hPziuqn1TcFK6PwBQ32Z8NcvRtAhFgodXf+PaX2igRwrp38VCrYd3zNXcZ3n6v9WYNCqkn3Ed5rwgY2yoqhtCH4q5TH81p4pag8fRhoZyrhiZ+BTt5JCY8aIB4Gb/SQ+H7PH6CPxMRXIhRLaUxJP6BV3UqyaO0FpslQqgnll+5w40jLZwOD0I5TXFwboNAcYa6lcMn2wrCLbP8i4R3+XBP7tIEkaTVRJYpDdlIhP/3r5/mIMVIqTzj+t7bOz4+NS1nV2HbTq5fTup4Wh+2U0aAdM81RP21ti7Pl6gkpy3TBTvOWBpODCRk1rK6Ei/Pbb3IW7pbEVEynJ70GOdFy/oqvHoBItACVhygkhbTyU6c+YJxv1U5OPOrTeWxo2eWNcrdQq3lExVVUMyTRr917oAjRYzwq77CPfv874D3/VA92lvvELlcyExU="
+
 jobs:
   fast_finish: true
 
