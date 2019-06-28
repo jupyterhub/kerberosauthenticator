@@ -2,7 +2,7 @@ import os
 
 import kerberos
 from jinja2 import ChoiceLoader, FileSystemLoader
-from jupyterhub.auth import Authenticator
+from jupyterhub.auth import Authenticator, LocalAuthenticator
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.utils import url_path_join
 from tornado import web
@@ -136,3 +136,12 @@ class KerberosAuthenticator(Authenticator):
         finally:
             if gss_context is not None:
                 kerberos.authGSSServerClean(gss_context)
+
+
+class KerberosLocalAuthenticator(LocalAuthenticator, KerberosAuthenticator):
+    """
+    Kerberos local authenticator for JupyterHub
+
+    Checks for local users, and can attempt to create them if they exist.
+    """
+    pass
