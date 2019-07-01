@@ -142,6 +142,6 @@ class KerberosLocalAuthenticator(LocalAuthenticator, KerberosAuthenticator):
     """
     Kerberos local authenticator for JupyterHub
 
-    Checks for local users, and can attempt to create them if they exist.
+    Checks for local users, and can attempt to create them if they don't exist.
     """
     pass
