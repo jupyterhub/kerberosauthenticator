@@ -3,19 +3,16 @@ import subprocess
 import sys
 
 import pytest
-from jupyterhub.tests.conftest import io_loop
 from jupyterhub.tests.mocking import MockHub
 
 from kerberosauthenticator import KerberosAuthenticator
-
-io_loop = io_loop
 
 HTTP_KEYTAB = '/root/HTTP.keytab'
 USERS_KEYTAB = '/root/users.keytab'
 
 
-@pytest.fixture(scope="module")
-def app(request, io_loop):
+@pytest.fixture
+async def app():
     app = MockHub(
         authenticator=KerberosAuthenticator(
             keytab=HTTP_KEYTAB
@@ -24,21 +21,19 @@ def app(request, io_loop):
         hub_ip="address.example.com"
     )
 
-    async def make_app():
-        await app.initialize([])
-        await app.start()
+    await app.initialize([])
+    await app.start()
 
-    io_loop.run_sync(make_app)
-
-    yield app
-
-    # disconnect logging during cleanup because pytest closes captured FDs prematurely
-    app.log.handlers = []
-    MockHub.clear_instance()
     try:
-        app.stop()
-    except Exception as e:
-        print("Error stopping Hub: %s" % e, file=sys.stderr)
+        yield app
+    finally:
+        # disconnect logging during cleanup because pytest closes captured FDs prematurely
+        app.log.handlers = []
+        MockHub.clear_instance()
+        try:
+            app.stop()
+        except Exception as e:
+            print("Error stopping Hub: %s" % e, file=sys.stderr)
 
 
 @pytest.fixture(params=[True, False], ids=['logged_in=True', 'logged_in=False'])
