@@ -9,7 +9,7 @@ conda install -c conda-forge \
     notebook \
     requests-kerberos
 
-pip install pytest-tornado
+pip install pytest-asyncio
 
 cd /working
 

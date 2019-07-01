@@ -7,9 +7,9 @@ from jupyterhub.tests.utils import async_requests
 from requests_kerberos import HTTPKerberosAuth
 
 
-@pytest.mark.gen_test(timeout=60)
+@pytest.mark.asyncio
 @pytest.mark.parametrize('auto_login', [True, False])
-def test_integration(app, auto_login, logged_in):
+async def test_integration(app, auto_login, logged_in):
     app.authenticator.auto_login = auto_login
 
     # Create a user
@@ -17,7 +17,7 @@ def test_integration(app, auto_login, logged_in):
 
     if auto_login:
         url = public_url(app, path="/hub/login")
-        resp = yield async_requests.get(url)
+        resp = await async_requests.get(url)
         # Sends back 401 requesting authentication
         assert resp.status_code == 401
         # 401 page is formatted nicely
@@ -33,7 +33,7 @@ def test_integration(app, auto_login, logged_in):
         url = public_url(app, path="/hub/kerberos_login")
 
     # Go through the login procedure
-    resp = yield async_requests.get(
+    resp = await async_requests.get(
         url,
         auth=HTTPKerberosAuth(hostname_override="address.example.com")
     )
