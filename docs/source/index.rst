@@ -22,7 +22,7 @@ the JupyterHub server.
 
 .. code::
 
-    pip install git+https://github.com/jcrist/kerberosauthenticator.git
+    pip install git+https://github.com/jupyterhub/kerberosauthenticator.git
 
 
 Configuration

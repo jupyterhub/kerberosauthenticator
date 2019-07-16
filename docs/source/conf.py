@@ -27,8 +27,8 @@ extensions = ['sphinx.ext.autodoc',
 numpydoc_show_class_members = False
 
 extlinks = {
-    'issue': ('https://github.com/jcrist/kerberosauthenticator/issues/%s', 'Issue #'),
-    'pr': ('https://github.com/jcrist/kerberosauthenticator/pull/%s', 'PR #')
+    'issue': ('https://github.com/jupyterhub/kerberosauthenticator/issues/%s', 'Issue #'),
+    'pr': ('https://github.com/jupyterhub/kerberosauthenticator/pull/%s', 'PR #')
 }
 
 # Sphinx Theme
@@ -40,7 +40,7 @@ html_theme_options = {
     'description': 'A JupyterHub Authenticator using Kerberos',
     'github_button': True,
     'github_count': False,
-    'github_user': 'jcrist',
+    'github_user': 'jupyterhub',
     'github_repo': 'kerberosauthenticator',
     'travis_button': True,
     'show_powered_by': False,

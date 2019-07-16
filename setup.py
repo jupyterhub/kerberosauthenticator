@@ -13,10 +13,10 @@ setup(
     maintainer_email='jiminy.crist@gmail.com',
     description='A JupyterHub authenticator using Kerberos',
     long_description=long_description,
-    url='http://github.com/jcrist/kerberosauthenticator',
+    url='http://github.com/jupyterhub/kerberosauthenticator',
     project_urls={
-        'Source': 'https://github.com/jcrist/kerberosauthenticator',
-        'Issue Tracker': 'https://github.com/jcrist/kerberosauthenticator/issues'
+        'Source': 'https://github.com/jupyterhub/kerberosauthenticator',
+        'Issue Tracker': 'https://github.com/jupyterhub/kerberosauthenticator/issues'
     },
     keywords='jupyter contentsmanager HDFS Hadoop',
     classifiers=[
