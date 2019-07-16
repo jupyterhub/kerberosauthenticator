@@ -1,7 +1,7 @@
 kerberosauthenticator
 =====================
 
-|travis| |pypi|
+|travis| |pypi| |rtfd|
 
 A JupyterHub Authenticator_ using Kerberos. See `the documentation`_ for more
 information.
@@ -15,6 +15,8 @@ New BSD. See the `License File`_.
    :target: https://travis-ci.org/jupyterhub/kerberosauthenticator
 .. |pypi| image:: https://img.shields.io/pypi/v/jupyterhub-kerberosauthenticator.svg
    :target: https://pypi.org/project/jupyterhub-kerberosauthenticator/
+.. |rtfd| image:: https://readthedocs.org/projects/jupyterhub-kerberosauthenticator/badge/?version=latest
+   :target: https://jupyterhub-kerberosauthenticator.readthedocs.io
 
 .. _Authenticator: https://jupyterhub.readthedocs.io/en/stable/reference/authenticators.html
 .. _License File: https://github.com/jupyterhub/kerberosauthenticator/blob/master/LICENSE
