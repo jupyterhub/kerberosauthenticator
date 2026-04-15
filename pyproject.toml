@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=80", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jupyterhub-kerberosauthenticator"
+description = "A JupyterHub authenticator using Kerberos"
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [
+    {name = "Jim Crist", email = "jiminy.crist@gmail.com"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Framework :: Jupyter",
+]
+keywords = ["Jupyter"]
+dependencies = [
+    "jupyterhub>=4",
+    "pykerberos>=1.2.4; platform_system != 'Windows'",
+    "winkerberos>=0.12.0; platform_system == 'Windows'",
+]
+dynamic = ["version"]
+
+[tool.setuptools]
+include-package-data = true
+packages = ["kerberosauthenticator"]
+
+[tool.setuptools_scm]
+version_file = "kerberosauthenticator/_version.py"
+
+[project.entry-points."jupyterhub.authenticators"]
+kerberos = "kerberosauthenticator.auth:KerberosAuthenticator"
+local-kerberos = "kerberosauthenticator.auth:KerberosLocalAuthenticator"
+
+[project.urls]
+Homepage = "http://github.com/jupyterhub/kerberosauthenticator"
+Source = "http://github.com/jupyterhub/kerberosauthenticator"
+Issues = "https://github.com/jupyterhub/kerberosauthenticator/issues"

@@ -9,3 +9,5 @@ docs/build/
 .eggs/
 .DS_Store
 htmlcov/
+
+kerberosauthenticator/_version.py
