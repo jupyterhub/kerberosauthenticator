@@ -22,7 +22,7 @@ class KerberosLoginHandler(BaseHandler):
 
         self.log.debug('Adding %s to template path', TEMPLATE_DIR)
         loader = FileSystemLoader([TEMPLATE_DIR])
-        env = self.settings['jinja2_env']
+        env = self.settings['jinja2_env_sync']
         previous_loader = env.loader
         env.loader = ChoiceLoader([previous_loader, loader])
         self._loaded = True
@@ -31,7 +31,8 @@ class KerberosLoginHandler(BaseHandler):
         self.set_status(401)
         data = self.render_template(
             'kerberos_login_error.html',
-            login_url=self.settings['login_url']
+            login_url=self.settings['login_url'],
+            sync=True
         )
         self.write(data)
         self.set_header("WWW-Authenticate", "Negotiate")
