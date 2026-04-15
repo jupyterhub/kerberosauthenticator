@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=80", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -33,6 +33,9 @@ dynamic = ["version"]
 include-package-data = true
 packages = ["kerberosauthenticator"]
 
+[tool.setuptools_scm]
+version_file = "kerberosauthenticator/_version.py"
+
 [project.entry-points."jupyterhub.authenticators"]
 kerberos = "kerberosauthenticator.auth:KerberosAuthenticator"
 local-kerberos = "kerberosauthenticator.auth:KerberosLocalAuthenticator"
@@ -41,11 +44,3 @@ local-kerberos = "kerberosauthenticator.auth:KerberosLocalAuthenticator"
 Homepage = "http://github.com/jupyterhub/kerberosauthenticator"
 Source = "http://github.com/jupyterhub/kerberosauthenticator"
 Issues = "https://github.com/jupyterhub/kerberosauthenticator/issues"
-
-[tool.versioneer]
-VCS = git
-style = pep440
-versionfile_source = kerberosauthenticator/_version.py
-versionfile_build = kerberosauthenticator/_version.py
-tag_prefix =
-parentdir_prefix = kerberosauthenticator-
