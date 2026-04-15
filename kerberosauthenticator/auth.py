@@ -22,17 +22,16 @@ class KerberosLoginHandler(BaseHandler):
 
         self.log.debug('Adding %s to template path', TEMPLATE_DIR)
         loader = FileSystemLoader([TEMPLATE_DIR])
-        env = self.settings['jinja2_env_sync']
+        env = self.settings['jinja2_env']
         previous_loader = env.loader
         env.loader = ChoiceLoader([previous_loader, loader])
         self._loaded = True
 
-    def raise_auth_required(self):
+    async def raise_auth_required(self):
         self.set_status(401)
-        data = self.render_template(
+        data = await self.render_template(
             'kerberos_login_error.html',
             login_url=self.settings['login_url'],
-            sync=True
         )
         self.write(data)
         self.set_header("WWW-Authenticate", "Negotiate")
@@ -41,11 +40,11 @@ class KerberosLoginHandler(BaseHandler):
     async def get(self):
         auth_header = self.request.headers.get('Authorization')
         if not auth_header:
-            self.raise_auth_required()
+            await self.raise_auth_required()
 
         auth_type, auth_key = auth_header.split(" ", 1)
         if auth_type != 'Negotiate':
-            self.raise_auth_required()
+            await self.raise_auth_required()
 
         # Headers are of the proper form, initialize login routine
         user = await self.login_user()
