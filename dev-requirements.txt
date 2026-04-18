@@ -1,0 +1,5 @@
+flake8
+notebook
+pytest
+pytest-asyncio
+requests-kerberos

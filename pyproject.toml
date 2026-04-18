@@ -22,15 +22,17 @@ classifiers = [
     "Framework :: Jupyter",
 ]
 keywords = ["Jupyter"]
-dependencies = [
-    "jupyterhub>=4",
-    "pykerberos>=1.2.4",
-]
 dynamic = ["version"]
 
 [tool.setuptools]
 include-package-data = true
 packages = ["kerberosauthenticator"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = {file = ["dev-requirements.txt"]}
 
 [tool.setuptools_scm]
 version_file = "kerberosauthenticator/_version.py"
