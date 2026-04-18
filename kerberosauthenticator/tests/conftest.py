@@ -3,6 +3,7 @@ import subprocess
 import sys
 
 import pytest
+import pytest_asyncio
 from jupyterhub.tests.mocking import MockHub
 
 from kerberosauthenticator import KerberosAuthenticator
@@ -11,7 +12,7 @@ HTTP_KEYTAB = '/root/HTTP.keytab'
 USERS_KEYTAB = '/root/users.keytab'
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def app():
     app = MockHub(
         authenticator=KerberosAuthenticator(
