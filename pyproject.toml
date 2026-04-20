@@ -24,8 +24,7 @@ classifiers = [
 keywords = ["Jupyter"]
 dependencies = [
     "jupyterhub>=4",
-    "pykerberos>=1.2.4; platform_system != 'Windows'",
-    "winkerberos>=0.12.0; platform_system == 'Windows'",
+    "pykerberos>=1.2.4",
 ]
 dynamic = ["version"]
 
