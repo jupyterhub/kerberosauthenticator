@@ -57,7 +57,7 @@ To enable ``kerberosauthenticator``, add the following lines to your
 .. code-block:: python
 
     c.JupyterHub.authenticator_class = 'kerberosauthenticator.KerberosAuthenticator'
-    c.JupyterHub.keytab = '/etc/jupyterhub/HTTP.keytab'
+    c.KerberosAuthenticator.keytab = '/etc/jupyterhub/HTTP.keytab'
 
 For many systems these parameters will be sufficient. Authenticators_ support
 several other options such as whitelists or post-auth hooks. For more
