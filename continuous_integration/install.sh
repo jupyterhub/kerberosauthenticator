@@ -14,3 +14,11 @@ pip install pytest-asyncio
 cd /working
 
 python setup.py develop
+
+
+
+
+
+. /venv/bin/activate
+cd /working
+python3 -mpip install -r requirements.txt -r dev-requirements.txt -e .

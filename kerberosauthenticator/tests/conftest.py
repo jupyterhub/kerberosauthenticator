@@ -12,11 +12,12 @@ HTTP_KEYTAB = '/root/HTTP.keytab'
 USERS_KEYTAB = '/root/users.keytab'
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function")
 async def app():
     app = MockHub(
         authenticator=KerberosAuthenticator(
-            keytab=HTTP_KEYTAB
+            keytab=HTTP_KEYTAB,
+            allow_all=True,
         ),
         cookie_secret=os.urandom(32),
         hub_ip="address.example.com"
