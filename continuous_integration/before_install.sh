@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+set -eu
+
 ci_dir="$(dirname "${BASH_SOURCE[0]}")"
 full_path_ci_dir="$(cd "${ci_dir}" && pwd)"
 git_root="$(dirname "$full_path_ci_dir")"

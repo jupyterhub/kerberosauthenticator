@@ -1,6 +1,7 @@
 FROM docker.io/library/alpine:3.23.4
 
 RUN apk add --no-cache \
+    bash \
     gcc \
     git \
     krb5 \
@@ -38,11 +39,3 @@ RUN python3 -mvenv --system-site-packages /venv
 RUN git config --global --add safe.directory /working
 
 CMD ["supervisord", "--configuration", "/etc/supervisord.conf"]
-
-# docker run -it --rm --name ci -v ~/work/jupyter/kerberosauthenticator:/src -h address.example.com kerberosauthenticator-ci
-# . /venv/bin/activate
-# cd /src
-# python3 -mpip install -r requirements.txt -r dev-requirements.txt
-
-# python3 -mpip install -e . pytest-asyncio requests-kerberos
-# python3 -mpytest --disable-warnings -x
