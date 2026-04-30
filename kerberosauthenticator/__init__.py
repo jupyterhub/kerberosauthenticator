@@ -5,8 +5,4 @@ try:
 except ImportError:
     __version__ = "UNKNOWN"
 
-__all__ = [
-  "__version__",
-  "KerberosAuthenticator",
-  "KerberosLocalAuthenticator"
-]
+__all__ = ["__version__", "KerberosAuthenticator", "KerberosLocalAuthenticator"]

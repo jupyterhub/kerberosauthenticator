@@ -8,8 +8,8 @@ from jupyterhub.tests.mocking import MockHub
 
 from kerberosauthenticator import KerberosAuthenticator
 
-HTTP_KEYTAB = '/root/HTTP.keytab'
-USERS_KEYTAB = '/root/users.keytab'
+HTTP_KEYTAB = "/root/HTTP.keytab"
+USERS_KEYTAB = "/root/users.keytab"
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -20,7 +20,7 @@ async def app():
             allow_all=True,
         ),
         cookie_secret=os.urandom(32),
-        hub_ip="address.example.com"
+        hub_ip="address.example.com",
     )
 
     await app.initialize([])
@@ -38,7 +38,7 @@ async def app():
             print("Error stopping Hub: %s" % e, file=sys.stderr)
 
 
-@pytest.fixture(params=[True, False], ids=['logged_in=True', 'logged_in=False'])
+@pytest.fixture(params=[True, False], ids=["logged_in=True", "logged_in=False"])
 def logged_in(request):
     kdestroy()
     if request.param:
@@ -48,7 +48,7 @@ def logged_in(request):
     return request.param
 
 
-def kinit(username='alice'):
+def kinit(username="alice"):
     subprocess.check_call(["kinit", "-kt", USERS_KEYTAB, username])
 
 
