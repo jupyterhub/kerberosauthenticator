@@ -1,0 +1,23 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Start test container
+        run: ./continuous_integration/before_install.sh
+
+      - name: Install dependencies
+        run: docker exec -i kerberosauthenticator-testing ./working/continuous_integration/install.sh
+
+      - name: Run tests
+        run: docker exec -i kerberosauthenticator-testing ./working/continuous_integration/script.sh

@@ -1,16 +1,8 @@
 #!/usr/bin/env bash
-source /opt/conda/bin/activate
 
-conda install -c conda-forge \
-    jupyterhub \
-    pykerberos \
-    pytest \
-    flake8 \
-    notebook \
-    requests-kerberos
+. /venv/bin/activate
 
-pip install pytest-asyncio
+set -eu
 
 cd /working
-
-python setup.py develop
+python3 -mpip install -r requirements.txt -r dev-requirements.txt -e .

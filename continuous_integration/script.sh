@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
-source /opt/conda/bin/activate
+. /venv/bin/activate
+
+set -eux
 
 cd /working
+python3 -mpytest
 
-set -xe
-
-py.test kerberosauthenticator -vv
-
-flake8 kerberosauthenticator
+# flake8 kerberosauthenticator

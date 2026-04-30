@@ -22,15 +22,17 @@ classifiers = [
     "Framework :: Jupyter",
 ]
 keywords = ["Jupyter"]
-dependencies = [
-    "jupyterhub>=4",
-    "pykerberos>=1.2.4",
-]
 dynamic = ["version"]
 
 [tool.setuptools]
 include-package-data = true
 packages = ["kerberosauthenticator"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = {file = ["dev-requirements.txt"]}
 
 [tool.setuptools_scm]
 version_file = "kerberosauthenticator/_version.py"
@@ -43,3 +45,11 @@ local-kerberos = "kerberosauthenticator.auth:KerberosLocalAuthenticator"
 Homepage = "http://github.com/jupyterhub/kerberosauthenticator"
 Source = "http://github.com/jupyterhub/kerberosauthenticator"
 Issues = "https://github.com/jupyterhub/kerberosauthenticator/issues"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    # kerberosauthenticator/tests/*.py imports several items from jupyterhub.tests
+    # which results in warnings about JupyterHub pytest marks that aren't used in
+    # this project
+    "ignore::_pytest.warning_types.PytestUnknownMarkWarning"
+]

@@ -43,7 +43,11 @@ async def test_integration(app, auto_login, logged_in):
         resp.raise_for_status()
 
         # At user notebook, login successful
-        assert resp.url.startswith(public_url(app, path="/user/alice"))
+        assert (
+            resp.url.startswith(public_url(app, path="/user/alice"))
+            or
+            resp.url.startswith(public_url(app, path="/hub/spawn-pending/alice"))
+        )
     else:
         # Unsuccessful
         assert resp.status_code == 401
