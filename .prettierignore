@@ -1,0 +1,2 @@
+kerberosauthenticator/templates/*.html
+docs/source/_templates/*.html

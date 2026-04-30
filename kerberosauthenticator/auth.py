@@ -8,8 +8,7 @@ from jupyterhub.utils import url_path_join
 from tornado import web
 from traitlets import Unicode
 
-
-TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
 
 class KerberosLoginHandler(BaseHandler):
@@ -20,9 +19,9 @@ class KerberosLoginHandler(BaseHandler):
             return
         super().__init__(*args, **kwargs)
 
-        self.log.debug('Adding %s to template path', TEMPLATE_DIR)
+        self.log.debug("Adding %s to template path", TEMPLATE_DIR)
         loader = FileSystemLoader([TEMPLATE_DIR])
-        env = self.settings['jinja2_env']
+        env = self.settings["jinja2_env"]
         previous_loader = env.loader
         env.loader = ChoiceLoader([previous_loader, loader])
         self._loaded = True
@@ -30,20 +29,20 @@ class KerberosLoginHandler(BaseHandler):
     async def raise_auth_required(self):
         self.set_status(401)
         data = await self.render_template(
-            'kerberos_login_error.html',
-            login_url=self.settings['login_url'],
+            "kerberos_login_error.html",
+            login_url=self.settings["login_url"],
         )
         self.write(data)
         self.set_header("WWW-Authenticate", "Negotiate")
         raise web.Finish()
 
     async def get(self):
-        auth_header = self.request.headers.get('Authorization')
+        auth_header = self.request.headers.get("Authorization")
         if not auth_header:
             await self.raise_auth_required()
 
         auth_type, auth_key = auth_header.split(" ", 1)
-        if auth_type != 'Negotiate':
+        if auth_type != "Negotiate":
             await self.raise_auth_required()
 
         # Headers are of the proper form, initialize login routine
@@ -65,38 +64,38 @@ class KerberosAuthenticator(Authenticator):
         help="""The service's kerberos principal name.
 
         This is almost always "HTTP" (the default)""",
-        config=True
+        config=True,
     )
 
-    keytab = Unicode(
-        "HTTP.keytab",
-        help="The path to the keytab file",
-        config=True
-    )
+    keytab = Unicode("HTTP.keytab", help="The path to the keytab file", config=True)
 
     login_service = "kerberos"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        os.environ['KRB5_KTNAME'] = self.keytab
+        os.environ["KRB5_KTNAME"] = self.keytab
 
     def get_handlers(self, app):
-        return [('/kerberos_login', KerberosLoginHandler)]
+        return [("/kerberos_login", KerberosLoginHandler)]
 
     def login_url(self, base_url):
-        return url_path_join(base_url, 'kerberos_login')
+        return url_path_join(base_url, "kerberos_login")
 
     async def authenticate(self, handler, data):
-        auth_header = handler.request.headers.get('Authorization')
+        auth_header = handler.request.headers.get("Authorization")
         if not auth_header:  # pragma: nocover
-            self.log.error("authenticate hit with no kerberos credentials, "
-                           "this code path should never occur")
+            self.log.error(
+                "authenticate hit with no kerberos credentials, "
+                "this code path should never occur"
+            )
             return None
 
         auth_type, auth_key = auth_header.split(" ", 1)
-        if auth_type != 'Negotiate':  # pragma: nocover
-            self.log.error("authenticate hit with no kerberos credentials, "
-                           "this code path should never occur")
+        if auth_type != "Negotiate":  # pragma: nocover
+            self.log.error(
+                "authenticate hit with no kerberos credentials, "
+                "this code path should never occur"
+            )
             return None
 
         gss_context = None
@@ -127,11 +126,12 @@ class KerberosAuthenticator(Authenticator):
             user = fulluser.split("@", 1)[0]
 
             # Complete the protocol by responding with the Negotiate header
-            handler.set_header('WWW-Authenticate', "Negotiate %s" % gss_key)
+            handler.set_header("WWW-Authenticate", "Negotiate %s" % gss_key)
             return user
         except kerberos.GSSError as err:  # pragma: nocover
-            self.log.error("Error occurred during kerberos authentication",
-                           exc_info=err)
+            self.log.error(
+                "Error occurred during kerberos authentication", exc_info=err
+            )
             return None
         finally:
             if gss_context is not None:
@@ -144,4 +144,3 @@ class KerberosLocalAuthenticator(LocalAuthenticator, KerberosAuthenticator):
 
     Checks for local users, and can attempt to create them if they don't exist.
     """
-    pass
