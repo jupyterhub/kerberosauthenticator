@@ -51,5 +51,5 @@ filterwarnings = [
     # kerberosauthenticator/tests/*.py imports several items from jupyterhub.tests
     # which results in warnings about JupyterHub pytest marks that aren't used in
     # this project
-    "ignore::_pytest.warning_types.PytestUnknownMarkWarning"
+    "ignore::_pytest.warning_types.PytestUnknownMarkWarning:jupyterhub"
 ]
