@@ -35,3 +35,57 @@ jobs:
 
       - name: Run tests
         run: docker exec -i kerberosauthenticator-testing ./working/continuous_integration/script.sh
+
+  build-release:
+    runs-on: ubuntu-24.04
+    needs:
+      - lint
+      - test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.14"
+
+      - name: install build requirements
+        run: |
+          pip install --upgrade pip
+          pip install build
+          pip freeze
+
+      - name: build release
+        run: |
+          python -m build --sdist --wheel .
+          ls -l dist
+
+      - name: upload dists
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ github.repository.name }}-dist
+          path: dist/
+
+  pypi-publish:
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs:
+      - build-release
+    environment:
+      name: release
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Get release artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ github.repository.name }}-dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
