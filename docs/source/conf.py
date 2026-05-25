@@ -13,7 +13,7 @@ release = version = kerberosauthenticator.__version__
 
 source_suffix = ".rst"
 master_doc = "index"
-language = None
+language = "en"
 pygments_style = "sphinx"
 exclude_patterns = []
 
@@ -24,7 +24,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.extlinks",
     "sphinx.ext.napoleon",
-    "autodoc_traitlets",
+    "autodoc_traits",
 ]
 
 numpydoc_show_class_members = False
