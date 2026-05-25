@@ -48,7 +48,6 @@ html_theme_options = {
     "github_count": False,
     "github_user": "jupyterhub",
     "github_repo": "kerberosauthenticator",
-    "travis_button": True,
     "show_powered_by": False,
     "page_width": "960px",
     "sidebar_width": "250px",
