@@ -13,7 +13,7 @@ release = version = kerberosauthenticator.__version__
 
 source_suffix = ".rst"
 master_doc = "index"
-language = None
+language = "en"
 pygments_style = "sphinx"
 exclude_patterns = []
 
@@ -24,7 +24,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.extlinks",
     "sphinx.ext.napoleon",
-    "autodoc_traitlets",
+    "autodoc_traits",
 ]
 
 numpydoc_show_class_members = False
@@ -48,7 +48,6 @@ html_theme_options = {
     "github_count": False,
     "github_user": "jupyterhub",
     "github_repo": "kerberosauthenticator",
-    "travis_button": True,
     "show_powered_by": False,
     "page_width": "960px",
     "sidebar_width": "250px",
