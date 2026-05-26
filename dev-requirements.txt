@@ -1,4 +1,5 @@
 flake8
+github-activity>=1.1.6
 notebook
 pytest
 pytest-asyncio
