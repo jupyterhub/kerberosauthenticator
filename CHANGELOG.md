@@ -2,7 +2,7 @@
 
 ## 1.0
 
-### 1.0.0rc1 - 2026-05-XX
+### 1.0.0rc1 - 2026-05-26
 
 ([full changelog](https://github.com/jupyterhub/kerberosauthenticator/compare/0.2.0...1.0.0rc1))
 
