@@ -35,9 +35,9 @@ class KerberosLoginHandler(BaseHandler):
             "kerberos_login_error.html",
             login_url=self.settings["login_url"],
         )
-        self.write(data)
         self.add_header("WWW-Authenticate", "Negotiate")
         self.add_header("WWW-Authenticate", "Basic")
+        self.write(data)
         raise web.Finish()
 
     async def get(self):
@@ -52,7 +52,7 @@ class KerberosLoginHandler(BaseHandler):
         # Headers are of the proper form, initialize login routine
         user = await self.login_user()
         if user is None:
-            raise web.HTTPError(403)
+            raise web.HTTPError(401)
         else:
             # Logged in, redirect to next url
             self.redirect(self.get_next_url(user))
@@ -64,10 +64,10 @@ class KerberosAuthenticator(Authenticator):
     """
 
     service_name = Unicode(
-        f"http/{socket.gethostname()}",
+        f"HTTP/{socket.gethostname().lower()}",
         help="""Kerberos SPN (Server Principal Name).
 
-        This should normally be http/<hostname>""",
+        This should normally be HTTP/<hostname>""",
         config=True
     )
 
@@ -118,7 +118,6 @@ class KerberosAuthenticator(Authenticator):
                 if not client_ctx.complete or not server_ctx.complete:
                     self.log.warn("GSS client/server step failed for password auth")
                     return None
-                pass
             else:
                 self.log.error(
                     "authenticate hit with no kerberos credentials, "
