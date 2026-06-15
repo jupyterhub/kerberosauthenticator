@@ -1,10 +1,13 @@
+import base64
 import os
 
-import kerberos
+import gssapi
+from gssapi.raw import acquire_cred_with_password
+from gssapi.raw.misc import GSSError
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.auth import Authenticator, LocalAuthenticator
 from jupyterhub.handlers import BaseHandler
-from jupyterhub.utils import url_path_join
+from jupyterhub.utils import socket, url_path_join
 from tornado import web
 from traitlets import Unicode
 
@@ -33,7 +36,8 @@ class KerberosLoginHandler(BaseHandler):
             login_url=self.settings["login_url"],
         )
         self.write(data)
-        self.set_header("WWW-Authenticate", "Negotiate")
+        self.add_header("WWW-Authenticate", "Negotiate")
+        self.add_header("WWW-Authenticate", "Basic")
         raise web.Finish()
 
     async def get(self):
@@ -42,7 +46,7 @@ class KerberosLoginHandler(BaseHandler):
             await self.raise_auth_required()
 
         auth_type, auth_key = auth_header.split(" ", 1)
-        if auth_type != "Negotiate":
+        if auth_type != "Negotiate" and auth_type != "Basic":
             await self.raise_auth_required()
 
         # Headers are of the proper form, initialize login routine
@@ -60,11 +64,11 @@ class KerberosAuthenticator(Authenticator):
     """
 
     service_name = Unicode(
-        "HTTP",
-        help="""The service's kerberos principal name.
+        f"http/{socket.gethostname()}",
+        help="""Kerberos SPN (Server Principal Name).
 
-        This is almost always "HTTP" (the default)""",
-        config=True,
+        This should normally be http/<hostname>""",
+        config=True
     )
 
     keytab = Unicode("HTTP.keytab", help="The path to the keytab file", config=True)
@@ -91,51 +95,41 @@ class KerberosAuthenticator(Authenticator):
             return None
 
         auth_type, auth_key = auth_header.split(" ", 1)
-        if auth_type != "Negotiate":  # pragma: nocover
-            self.log.error(
-                "authenticate hit with no kerberos credentials, "
-                "this code path should never occur"
-            )
-            return None
 
-        gss_context = None
+        server_name = gssapi.Name(self.service_name)
+        server_creds = gssapi.Credentials(usage='accept', name=server_name)
+        server_ctx = gssapi.SecurityContext(usage='accept', creds=server_creds)
+
         try:
-            # Initialize kerberos context
-            rc, gss_context = kerberos.authGSSServerInit(self.service_name)
-
-            # NOTE: Per the pykerberos documentation, the return code should be
-            # checked after each step. However, after reading the pykerberos
-            # code no method used here will ever return anything but
-            # AUTH_GSS_COMPLETE (all other cases will raise an exception).  We
-            # keep these checks in just in case pykerberos changes its behavior
-            # to match its docs, but they likely never will trigger.
-            if rc != kerberos.AUTH_GSS_COMPLETE:  # pragma: nocover
-                self.log.error("GSS server init failed, return code = %r", rc)
+            if auth_type == "Negotiate":
+                in_token = base64.b64decode(auth_key)
+                out_token = server_ctx.step(in_token)
+                if not server_ctx.complete:
+                    self.log.warn("GSS server step failed")
+                    return None
+                handler.set_header("WWW-Authenticate", "Negotiate %s" % base64.b64encode(out_token).decode('ascii'))
+            elif auth_type == "Basic":
+                user, password = base64.b64decode(auth_key).split(b':', 1)
+                user = user.decode('ascii')
+                client_name = gssapi.Name(user)
+                client_creds = acquire_cred_with_password(client_name, password).creds
+                client_ctx = gssapi.SecurityContext(usage='initiate', name=server_name, creds=client_creds)
+                client_ctx.step(server_ctx.step(client_ctx.step()))
+                if not client_ctx.complete or not server_ctx.complete:
+                    self.log.warn("GSS client/server step failed for password auth")
+                    return None
+                pass
+            else:
+                self.log.error(
+                    "authenticate hit with no kerberos credentials, "
+                    "this code path should never occur"
+                )
                 return None
-
-            # Challenge step
-            rc = kerberos.authGSSServerStep(gss_context, auth_key)
-            if rc != kerberos.AUTH_GSS_COMPLETE:  # pragma: nocover
-                # Only warn here, since this happens for any user failing login
-                self.log.warn("GSS server step failed, return code = %r", rc)
-                return None
-            gss_key = kerberos.authGSSServerResponse(gss_context)
-
-            # Retrieve user name
-            fulluser = kerberos.authGSSServerUserName(gss_context)
-            user = fulluser.split("@", 1)[0]
-
-            # Complete the protocol by responding with the Negotiate header
-            handler.set_header("WWW-Authenticate", "Negotiate %s" % gss_key)
+            user = str(server_ctx.initiator_name).split('@', 1)[0]
             return user
-        except kerberos.GSSError as err:  # pragma: nocover
-            self.log.error(
-                "Error occurred during kerberos authentication", exc_info=err
-            )
+        except GSSError as e:
+            self.log.error("Error occurred during kerberos authentication", exc_info=e)
             return None
-        finally:
-            if gss_context is not None:
-                kerberos.authGSSServerClean(gss_context)
 
 
 class KerberosLocalAuthenticator(LocalAuthenticator, KerberosAuthenticator):
