@@ -1,2 +1,2 @@
 jupyterhub>=4
-pykerberos>=1.2.4
+gssapi>=1.11.1
