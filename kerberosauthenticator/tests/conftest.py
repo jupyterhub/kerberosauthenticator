@@ -33,7 +33,7 @@ async def app():
         app.log.handlers = []
         MockHub.clear_instance()
         try:
-            app.stop()
+            await app.stop()
         except Exception as e:
             print("Error stopping Hub: %s" % e, file=sys.stderr)
 
